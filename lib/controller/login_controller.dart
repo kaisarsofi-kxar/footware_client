@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:footware_client/model/user/user.dart';
 import 'package:footware_client/pages/home_page.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:otp_text_field_v2/otp_field_v2.dart';
 
 class LoginController extends GetxController {
+  GetStorage box = GetStorage();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   late CollectionReference userCollection;
 
@@ -18,6 +20,18 @@ class LoginController extends GetxController {
   bool otpFieldShown = false;
   int? otpSend;
   int? otpEntered;
+
+  User? loginUser;
+
+  @override
+  void onReady() {
+    Map<String,dynamic>? user = box.read("loginUser");
+    if(user != null){
+      loginUser = User.fromJson(user);
+      Get.offAll(()=>HomePage());
+    }
+      super.onReady();
+  }
 
   @override
   void onInit() {
@@ -53,7 +67,7 @@ class LoginController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    }finally{
+    } finally {
       update();
     }
   }
@@ -88,10 +102,10 @@ class LoginController extends GetxController {
       int otp = 1000 + random.nextInt(9000);
       print(otp);
 
-      String url = 'https://www.fast2sms.com/dev/bulkV2?authorization=XpqEn7201gLNBOY546dtKAazD9rvkhoPcCJme3lTyUfVSFRsuilZBjAxRNIs2M4Dgfm1zaohTVyOtU5K&route=otp&variables_values=$otp&flash=0&numbers=$number';
-    Response response = await GetConnect().get(url
-      );
-      if(response.body['message'][0] == "SMS sent successfully."){
+      String url =
+          'https://www.fast2sms.com/dev/bulkV2?authorization=XpqEn7201gLNBOY546dtKAazD9rvkhoPcCJme3lTyUfVSFRsuilZBjAxRNIs2M4Dgfm1zaohTVyOtU5K&route=otp&variables_values=$otp&flash=0&numbers=$number';
+      Response response = await GetConnect().get(url);
+      if (response.body['message'][0] == "SMS sent successfully.") {
         otpFieldShown = true;
         otpSend = otp;
         Get.snackbar("Successful", "Otp send Successfully",
@@ -106,25 +120,30 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<void> loginWithPhone() async{
+  Future<void> loginWithPhone() async {
     try {
-           String phoneNumber = loginNumberCtrl.text;
+      String phoneNumber = loginNumberCtrl.text;
 
-           if(phoneNumber.isNotEmpty){
-             var querySnapshot = await userCollection.where('number', isEqualTo: int.tryParse(phoneNumber)).limit(1).get();
-             if(querySnapshot.docs.isNotEmpty){
-
-               var userDoc = querySnapshot.docs.first;
-               var userDate = userDoc.data() as Map<String, dynamic>;
-               Get.snackbar("Success", "Login Successful ", colorText: Colors.green);
-               Get.offAll(()=>HomePage());
-             }else{
-               Get.snackbar("Error", "User Not Found, please Register ", colorText: Colors.red);
-             }
-           }else{
-             Get.snackbar("Error", "Enter a Phone number ", colorText: Colors.red);
-           }
-        }catch(e){
+      if (phoneNumber.isNotEmpty) {
+        var querySnapshot = await userCollection
+            .where('number', isEqualTo: int.tryParse(phoneNumber))
+            .limit(1)
+            .get();
+        if (querySnapshot.docs.isNotEmpty) {
+          var userDoc = querySnapshot.docs.first;
+          var userData = userDoc.data() as Map<String, dynamic>;
+          box.write('loginUser',userData);
+          Get.snackbar("Success", "Login Successful ", colorText: Colors.green);
+          loginNumberCtrl.clear();
+          Get.offAll(() => HomePage());
+        } else {
+          Get.snackbar("Error", "User Not Found, please Register ",
+              colorText: Colors.red);
+        }
+      } else {
+        Get.snackbar("Error", "Enter a Phone number ", colorText: Colors.red);
+      }
+    } catch (e) {
       print("Failed to login:  ${e.toString()}");
     }
   }

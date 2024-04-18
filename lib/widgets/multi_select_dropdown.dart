@@ -5,7 +5,8 @@ class MultiSelectDropdownBtn extends StatelessWidget {
   final List<String> items;
   final Function(List<String>) onSelectionChange;
 
-   MultiSelectDropdownBtn({super.key, required this.items, required this.onSelectionChange});
+
+   MultiSelectDropdownBtn({super.key, required this.items, required this.onSelectionChange, });
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +16,9 @@ class MultiSelectDropdownBtn extends StatelessWidget {
           child: DropdownButton2<String>(
             isExpanded: true,
             hint: Text(
-              'Select Items',
+              'Brand',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: Theme.of(context).hintColor,
               ),
             ),

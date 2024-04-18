@@ -24,7 +24,7 @@ class DropdownBtn extends StatelessWidget {
             hint: Text(
               selectedItemText,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: Theme.of(context).hintColor,
               ),
             ),

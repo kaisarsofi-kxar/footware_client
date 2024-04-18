@@ -30,8 +30,8 @@ class ProductCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: Image.network(
-                  'https://firebasestorage.googleapis.com/v0/b/footware-app-77436.appspot.com/o/download.jpeg?alt=media&token=e6705c2c-6900-4753-b2b3-ec7ab17fd53a',
-                  fit: BoxFit.cover,
+                  imageUrl,
+                   fit: BoxFit.cover,
                   width: double.maxFinite,
                   height: 120,
                 ),
